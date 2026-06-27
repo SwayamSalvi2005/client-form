@@ -1,0 +1,885 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Enquiry Form – Frigmaires Engineers</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Montserrat:wght@700;800;900&display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+  :root {
+    --navy:   #0b1f3a;
+    --navy2:  #122848;
+    --orange: #e8641e;
+    --orange2:#d4541a;
+    --light:  #f5f7fa;
+    --border: #dde3ed;
+    --text:   #1a2a40;
+    --muted:  #6b7a99;
+    --white:  #ffffff;
+    --step-done: #27ae60;
+    --radius: 10px;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--light);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* ── TOPBAR ── */
+  .topbar {
+    background: var(--navy);
+    padding: 8px 24px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 20px;
+    align-items: center;
+    font-size: 12px;
+    color: #a8bcd4;
+    flex-wrap: wrap;
+  }
+  .topbar a { color: #a8bcd4; text-decoration: none; display: flex; align-items: center; gap: 5px; }
+  .topbar a:hover { color: var(--orange); }
+  .topbar svg { width: 14px; height: 14px; fill: currentColor; }
+
+  /* ── HEADER ── */
+  header {
+    background: var(--white);
+    padding: 16px 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 3px solid var(--orange);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+  }
+  .logo-link { display: flex; align-items: center; gap: 12px; text-decoration: none; }
+  .logo-link img { height: 42px; object-fit: contain; }
+  .logo-text { font-family: 'Montserrat', sans-serif; font-size: 20px; font-weight: 800; color: var(--navy); letter-spacing: -0.5px; }
+  .logo-text span { color: var(--orange); }
+
+  .header-social { display: flex; gap: 10px; align-items: center; }
+  .social-btn {
+    width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    text-decoration: none; transition: transform 0.2s, background 0.2s;
+  }
+  .social-btn:hover { transform: scale(1.1); }
+  .social-btn.linkedin { background: #0077b5; }
+  .social-btn.youtube  { background: #ff0000; }
+  .social-btn.whatsapp { background: #25d366; }
+  .social-btn svg { width: 18px; height: 18px; fill: #fff; }
+
+  /* ── PAGE HERO ── */
+  .hero {
+    background: linear-gradient(135deg, var(--navy) 60%, var(--navy2) 100%);
+    color: var(--white);
+    text-align: center;
+    padding: 48px 24px 36px;
+  }
+  .hero-tag {
+    display: inline-block;
+    background: var(--orange);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 4px 14px;
+    border-radius: 20px;
+    margin-bottom: 14px;
+  }
+  .hero h1 {
+    font-family: 'Montserrat', sans-serif;
+    font-size: clamp(24px, 4vw, 40px);
+    font-weight: 900;
+    line-height: 1.15;
+    margin-bottom: 10px;
+  }
+  .hero h1 span { color: var(--orange); }
+  .hero p { color: #a8bcd4; font-size: 15px; max-width: 520px; margin: 0 auto; }
+
+  /* ── MAIN CARD ── */
+  .container {
+    max-width: 820px;
+    margin: 40px auto;
+    padding: 0 16px 60px;
+  }
+
+  .card {
+    background: var(--white);
+    border-radius: 16px;
+    box-shadow: 0 4px 32px rgba(0,0,0,0.10);
+    overflow: hidden;
+  }
+
+  /* ── STEP TRACKER ── */
+  .step-tracker {
+    background: var(--navy);
+    padding: 24px 32px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+  }
+  .step-tracker::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: calc(32px + 22px);
+    right: calc(32px + 22px);
+    height: 2px;
+    background: rgba(255,255,255,0.15);
+    transform: translateY(-50%);
+  }
+  .step-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    position: relative;
+    z-index: 1;
+    flex: 1;
+  }
+  .step-circle {
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 16px;
+    border: 2px solid rgba(255,255,255,0.2);
+    background: rgba(255,255,255,0.08);
+    color: rgba(255,255,255,0.4);
+    transition: all 0.3s;
+  }
+  .step-circle.active  { background: var(--orange); border-color: var(--orange); color: #fff; }
+  .step-circle.done    { background: var(--step-done); border-color: var(--step-done); color: #fff; }
+  .step-label { font-size: 11px; color: rgba(255,255,255,0.4); text-align: center; line-height: 1.3; }
+  .step-label.active { color: #fff; font-weight: 600; }
+  .step-label.done   { color: #27ae60; }
+
+  /* ── FORM PAGES ── */
+  .form-page { display: none; padding: 36px 40px; animation: fadeIn 0.3s ease; }
+  .form-page.active { display: block; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+  .form-page h2 {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--navy);
+    margin-bottom: 4px;
+  }
+  .form-page .subtitle {
+    color: var(--muted);
+    font-size: 13px;
+    margin-bottom: 28px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .form-group { display: flex; flex-direction: column; gap: 6px; }
+  .form-group.full { grid-column: 1 / -1; }
+
+  label { font-size: 13px; font-weight: 600; color: var(--text); }
+  label span.req { color: var(--orange); }
+  label span.opt { color: var(--muted); font-weight: 400; font-size: 11px; }
+
+  input, select, textarea {
+    width: 100%;
+    padding: 11px 14px;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius);
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    color: var(--text);
+    background: #f9fafb;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    outline: none;
+  }
+  input:focus, select:focus, textarea:focus {
+    border-color: var(--orange);
+    box-shadow: 0 0 0 3px rgba(232,100,30,0.12);
+    background: #fff;
+  }
+  input::placeholder, textarea::placeholder { color: #b0bac9; }
+  textarea { resize: vertical; min-height: 110px; }
+  select { appearance: none; cursor: pointer; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236b7a99' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; background-size: 16px; padding-right: 36px; }
+
+  .checkbox-group { display: flex; flex-direction: column; gap: 10px; }
+  .checkbox-item { display: flex; align-items: center; gap: 10px; cursor: pointer; }
+  .checkbox-item input[type="checkbox"] {
+    width: 18px; height: 18px;
+    accent-color: var(--orange);
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+  .checkbox-item span { font-size: 14px; color: var(--text); }
+
+  /* ── NAVIGATION BUTTONS ── */
+  .btn-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 32px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 28px;
+    border-radius: 8px;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s;
+    text-decoration: none;
+  }
+  .btn-primary { background: var(--orange); color: #fff; }
+  .btn-primary:hover { background: var(--orange2); transform: translateY(-1px); box-shadow: 0 4px 14px rgba(232,100,30,0.35); }
+  .btn-secondary { background: transparent; color: var(--navy); border: 1.5px solid var(--border); }
+  .btn-secondary:hover { background: var(--light); }
+  .btn-reset { background: transparent; color: var(--muted); border: 1.5px solid var(--border); }
+  .btn-reset:hover { background: #fff0ee; color: #c0392b; border-color: #c0392b; }
+  .btn-pdf  { background: var(--navy); color: #fff; }
+  .btn-pdf:hover  { background: var(--navy2); }
+  .btn-wa   { background: #25d366; color: #fff; }
+  .btn-wa:hover   { background: #1da851; }
+  .btn svg  { width: 18px; height: 18px; fill: currentColor; }
+
+  /* ── SUCCESS PANEL ── */
+  .success-panel {
+    display: none;
+    padding: 60px 40px;
+    text-align: center;
+    animation: fadeIn 0.4s ease;
+  }
+  .success-icon {
+    width: 80px; height: 80px;
+    background: #e9faf0;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 20px;
+  }
+  .success-icon svg { width: 40px; height: 40px; fill: var(--step-done); }
+  .success-panel h2 { font-family: 'Montserrat',sans-serif; font-size: 26px; font-weight: 800; color: var(--navy); margin-bottom: 8px; }
+  .success-panel p  { color: var(--muted); margin-bottom: 32px; max-width: 400px; margin-left: auto; margin-right: auto; }
+  .action-buttons   { display: flex; justify-content: center; gap: 14px; flex-wrap: wrap; }
+
+  /* ── FOOTER STRIP ── */
+  .footer-strip {
+    background: var(--navy);
+    color: #a8bcd4;
+    text-align: center;
+    font-size: 12px;
+    padding: 18px 24px;
+    margin-top: 40px;
+  }
+  .footer-strip a { color: var(--orange); text-decoration: none; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 640px) {
+    header { padding: 12px 16px; }
+    .logo-text { font-size: 16px; }
+    .logo-link img { height: 32px; }
+    .hero  { padding: 32px 16px 28px; }
+    .step-tracker { padding: 16px; }
+    .step-circle  { width: 36px; height: 36px; font-size: 14px; }
+    .step-label   { font-size: 9px; }
+    .form-page    { padding: 24px 20px; }
+    .form-grid    { grid-template-columns: 1fr; }
+    .form-group.full { grid-column: 1; }
+    .btn-row      { flex-direction: column; }
+    .btn          { width: 100%; justify-content: center; }
+    .action-buttons { flex-direction: column; align-items: center; }
+  }
+
+  @media (max-width: 420px) {
+    .topbar { justify-content: center; }
+    .step-label { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <a href="mailto:info@frigmaires.com">
+    <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+    info@frigmaires.com
+  </a>
+  <a href="tel:+917977088546">
+    <svg viewBox="0 0 24 24"><path d="M6.62 10.79a15.05 15.05 0 006.59 6.59l2.2-2.2a1 1 0 011.02-.24c1.12.37 2.33.57 3.57.57a1 1 0 011 1V20a1 1 0 01-1 1C10.18 21 3 13.82 3 5a1 1 0 011-1h3.5a1 1 0 011 1c0 1.25.2 2.45.57 3.57a1 1 0 01-.25 1.02l-2.2 2.2z"/></svg>
+    +91 7977 088546
+  </a>
+  <a href="https://www.linkedin.com/company/frigmaires/" target="_blank">LinkedIn</a>
+  <a href="https://www.youtube.com/c/Frigmaires1" target="_blank">YouTube</a>
+</div>
+
+<!-- HEADER -->
+<header>
+  <a class="logo-link" href="https://frigmaires.com" target="_blank" title="Go to Frigmaires Engineers">
+    <img src="https://frigmaires.com/wp-content/uploads/2022/09/Group-245@3x-237x38.webp"
+         alt="Frigmaires Engineers"
+         onerror="this.style.display='none'; document.querySelector('.logo-text').style.display='block'"/>
+    <span class="logo-text" style="display:none;">Frigm<span>aires</span></span>
+  </a>
+  <div class="header-social">
+    <a class="social-btn linkedin" href="https://www.linkedin.com/company/frigmaires/" target="_blank" title="LinkedIn">
+      <svg viewBox="0 0 24 24"><path d="M20.45 20.45h-3.56v-5.57c0-1.33-.03-3.04-1.85-3.04-1.86 0-2.14 1.45-2.14 2.94v5.67H9.34V9h3.41v1.56h.05c.47-.89 1.63-1.84 3.36-1.84 3.59 0 4.25 2.36 4.25 5.44v6.29zM5.34 7.43a2.07 2.07 0 110-4.13 2.07 2.07 0 010 4.13zm1.78 13.02H3.56V9h3.56v11.45zM22.22 0H1.77C.79 0 0 .78 0 1.73v20.54C0 23.22.79 24 1.77 24h20.44C23.2 24 24 23.22 24 22.27V1.73C24 .78 23.2 0 22.22 0z"/></svg>
+    </a>
+    <a class="social-btn youtube" href="https://www.youtube.com/c/Frigmaires1" target="_blank" title="YouTube">
+      <svg viewBox="0 0 24 24"><path d="M23.5 6.19a3.02 3.02 0 00-2.12-2.14C19.54 3.6 12 3.6 12 3.6s-7.54 0-9.38.45A3.02 3.02 0 00.5 6.19 31.62 31.62 0 000 12a31.62 31.62 0 00.5 5.81 3.02 3.02 0 002.12 2.14C4.46 20.4 12 20.4 12 20.4s7.54 0 9.38-.45a3.02 3.02 0 002.12-2.14A31.62 31.62 0 0024 12a31.62 31.62 0 00-.5-5.81zM9.75 15.52V8.48L15.83 12l-6.08 3.52z"/></svg>
+    </a>
+    <a class="social-btn whatsapp" href="https://wa.me/+917977088546" target="_blank" title="WhatsApp">
+      <svg viewBox="0 0 24 24"><path d="M17.47 14.38c-.3-.15-1.76-.87-2.03-.97s-.47-.15-.67.15-.77.97-.94 1.17-.35.22-.64.07a8.1 8.1 0 01-2.39-1.47 8.98 8.98 0 01-1.65-2.06c-.17-.3 0-.46.13-.6s.3-.35.44-.52.2-.3.3-.5.05-.37-.02-.52-.67-1.6-.91-2.19c-.24-.58-.49-.5-.67-.51h-.57c-.2 0-.52.07-.8.37S6 7.87 6 9.07c0 1.2.87 2.37 1 2.54s1.72 2.63 4.17 3.68a14.1 14.1 0 001.39.52c.58.18 1.11.16 1.53.1.47-.07 1.44-.59 1.64-1.16.2-.57.2-1.06.14-1.16-.06-.1-.25-.16-.54-.3zM12.05 2a10 10 0 00-8.49 15.25L2 22l4.87-1.54A10 10 0 1012.05 2z"/></svg>
+    </a>
+  </div>
+</header>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-tag">Official Enquiry Form</div>
+  <h1>Get a <span>Custom Quote</span> from<br/>Frigmaires Engineers</h1>
+  <p>25+ years of expertise in Lubricants, Grease, Construction Chemicals & Paint Plants. Fill the form below to get started.</p>
+</div>
+
+<!-- MAIN CONTAINER -->
+<div class="container">
+  <div class="card">
+
+    <!-- STEP TRACKER -->
+    <div class="step-tracker">
+      <div class="step-item">
+        <div class="step-circle active" id="sc1">1</div>
+        <div class="step-label active" id="sl1">Personal<br/>Info</div>
+      </div>
+      <div class="step-item">
+        <div class="step-circle" id="sc2">2</div>
+        <div class="step-label" id="sl2">Company<br/>Details</div>
+      </div>
+      <div class="step-item">
+        <div class="step-circle" id="sc3">3</div>
+        <div class="step-label" id="sl3">Product<br/>Interest</div>
+      </div>
+      <div class="step-item">
+        <div class="step-circle" id="sc4">4</div>
+        <div class="step-label" id="sl4">Enquiry<br/>Details</div>
+      </div>
+    </div>
+
+    <!-- STEP 1: Personal Info -->
+    <div class="form-page active" id="page1">
+      <h2>Personal Information</h2>
+      <p class="subtitle">Step 1 of 4 — Tell us about yourself</p>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Full Name <span class="req">*</span></label>
+          <input type="text" id="f_name" placeholder="e.g. Rajesh Sharma" value="Rajesh Sharma"/>
+        </div>
+        <div class="form-group">
+          <label>Email Address <span class="req">*</span></label>
+          <input type="email" id="f_email" placeholder="e.g. rajesh@company.com" value="rajesh@example.com"/>
+        </div>
+        <div class="form-group">
+          <label>Phone Number <span class="req">*</span></label>
+          <input type="tel" id="f_phone" placeholder="e.g. +91 98765 43210" value="+91 98765 43210"/>
+        </div>
+        <div class="form-group">
+          <label>Country <span class="req">*</span></label>
+          <select id="f_country">
+            <option value="">Select Country</option>
+            <option value="India" selected>India</option>
+            <option value="United Arab Emirates">United Arab Emirates</option>
+            <option value="Saudi Arabia">Saudi Arabia</option>
+            <option value="Bangladesh">Bangladesh</option>
+            <option value="Nigeria">Nigeria</option>
+            <option value="United Kingdom">United Kingdom</option>
+            <option value="United States">United States</option>
+            <option value="Germany">Germany</option>
+            <option value="Australia">Australia</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+        <div class="form-group full">
+          <label>City / State <span class="opt">(Optional)</span></label>
+          <input type="text" id="f_city" placeholder="e.g. Mumbai, Maharashtra" value="Mumbai, Maharashtra"/>
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-reset" onclick="resetForm()">
+          <svg viewBox="0 0 24 24"><path d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6a6 6 0 01-6 6 6 6 0 01-6-6H4a8 8 0 008 8 8 8 0 008-8c0-4.42-3.58-8-8-8z"/></svg>
+          Reset
+        </button>
+        <button class="btn btn-primary" onclick="nextStep(1)">
+          Next: Company Details
+          <svg viewBox="0 0 24 24"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- STEP 2: Company Details -->
+    <div class="form-page" id="page2">
+      <h2>Company Details</h2>
+      <p class="subtitle">Step 2 of 4 — Tell us about your business</p>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Company Name <span class="opt">(Optional)</span></label>
+          <input type="text" id="f_company" placeholder="e.g. ABC Industries Pvt. Ltd." value="ABC Industries Pvt. Ltd."/>
+        </div>
+        <div class="form-group">
+          <label>Company Website <span class="opt">(Optional)</span></label>
+          <input type="url" id="f_website" placeholder="e.g. https://abcindustries.com" value="https://abcindustries.com"/>
+        </div>
+        <div class="form-group full">
+          <label>Business Type <span class="req">*</span></label>
+          <select id="f_biztype">
+            <option value="">Select Business Type</option>
+            <option value="New Business" selected>New Business</option>
+            <option value="Existing Business">Existing Business</option>
+            <option value="Expansion of Existing Plant">Expansion of Existing Plant</option>
+            <option value="Consultant / Agent">Consultant / Agent</option>
+          </select>
+        </div>
+        <div class="form-group full">
+          <label>Annual Turnover (Approx.) <span class="opt">(Optional)</span></label>
+          <select id="f_turnover">
+            <option value="">Select Range</option>
+            <option value="Below ₹1 Cr">Below ₹1 Cr / $100K</option>
+            <option value="₹1–5 Cr">₹1–5 Cr / $100K–600K</option>
+            <option value="₹5–20 Cr" selected>₹5–20 Cr / $600K–2.5M</option>
+            <option value="₹20 Cr+">₹20 Cr+ / $2.5M+</option>
+            <option value="Prefer not to say">Prefer not to say</option>
+          </select>
+        </div>
+      </div>
+      <div class="btn-row">
+        <div style="display:flex;gap:10px;flex-wrap:wrap;">
+          <button class="btn btn-secondary" onclick="prevStep(2)">
+            <svg viewBox="0 0 24 24"><path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z"/></svg>
+            Back
+          </button>
+          <button class="btn btn-reset" onclick="resetForm()">
+            <svg viewBox="0 0 24 24"><path d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6a6 6 0 01-6 6 6 6 0 01-6-6H4a8 8 0 008 8 8 8 0 008-8c0-4.42-3.58-8-8-8z"/></svg>
+            Reset
+          </button>
+        </div>
+        <button class="btn btn-primary" onclick="nextStep(2)">
+          Next: Product Interest
+          <svg viewBox="0 0 24 24"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- STEP 3: Product Interest -->
+    <div class="form-page" id="page3">
+      <h2>Product of Interest</h2>
+      <p class="subtitle">Step 3 of 4 — Which plant or technology interests you?</p>
+      <div class="form-grid">
+        <div class="form-group full">
+          <label>Primary Product / Plant <span class="req">*</span></label>
+          <select id="f_product">
+            <option value="">Select Product</option>
+            <option value="Lube Oil Blending Plant" selected>Lube Oil Blending Plant</option>
+            <option value="Grease Manufacturing Plant">Grease Manufacturing Plant</option>
+            <option value="Waste Oil Recycling Plant">Waste Oil Recycling Plant</option>
+            <option value="Dry Mix Mortar Plant">Dry Mix Mortar Plant</option>
+            <option value="Alkyd Resin & Styrene Emulsion Plant">Alkyd Resin & Styrene Emulsion Plant</option>
+            <option value="Specialty Fluids & Additives">Specialty Fluids & Additives</option>
+            <option value="Paints and Coating Plant">Paints and Coating Plant</option>
+            <option value="Barrel / Corrugated Box Making Plant">Barrel / Corrugated Box Making Plant</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Estimated Plant Capacity <span class="opt">(Optional)</span></label>
+          <input type="text" id="f_capacity" placeholder="e.g. 25 MT/Day" value="25 MT/Day"/>
+        </div>
+        <div class="form-group">
+          <label>Project Timeline <span class="opt">(Optional)</span></label>
+          <select id="f_timeline">
+            <option value="">Select Timeline</option>
+            <option value="Within 3 months">Within 3 months</option>
+            <option value="3–6 months" selected>3–6 months</option>
+            <option value="6–12 months">6–12 months</option>
+            <option value="More than 1 year">More than 1 year</option>
+            <option value="Exploring / No fixed date">Exploring / No fixed date</option>
+          </select>
+        </div>
+        <div class="form-group full">
+          <label>Services Required <span class="opt">(Select all that apply)</span></label>
+          <div class="checkbox-group" style="margin-top:6px;">
+            <label class="checkbox-item"><input type="checkbox" checked/><span>Conceptual & Detailed Engineering</span></label>
+            <label class="checkbox-item"><input type="checkbox" checked/><span>Equipment Manufacturing & Supply</span></label>
+            <label class="checkbox-item"><input type="checkbox"/><span>Erection & Commissioning</span></label>
+            <label class="checkbox-item"><input type="checkbox"/><span>Training & Manpower Recruitment</span></label>
+            <label class="checkbox-item"><input type="checkbox"/><span>Raw Material Sourcing</span></label>
+            <label class="checkbox-item"><input type="checkbox"/><span>Annual Plant Audit & Maintenance</span></label>
+          </div>
+        </div>
+      </div>
+      <div class="btn-row">
+        <div style="display:flex;gap:10px;flex-wrap:wrap;">
+          <button class="btn btn-secondary" onclick="prevStep(3)">
+            <svg viewBox="0 0 24 24"><path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z"/></svg>
+            Back
+          </button>
+          <button class="btn btn-reset" onclick="resetForm()">
+            <svg viewBox="0 0 24 24"><path d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6a6 6 0 01-6 6 6 6 0 01-6-6H4a8 8 0 008 8 8 8 0 008-8c0-4.42-3.58-8-8-8z"/></svg>
+            Reset
+          </button>
+        </div>
+        <button class="btn btn-primary" onclick="nextStep(3)">
+          Next: Enquiry Details
+          <svg viewBox="0 0 24 24"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- STEP 4: Enquiry Details -->
+    <div class="form-page" id="page4">
+      <h2>Enquiry Details</h2>
+      <p class="subtitle">Step 4 of 4 — Tell us more about your project requirements</p>
+      <div class="form-grid">
+        <div class="form-group full">
+          <label>Project Description / Enquiry <span class="req">*</span></label>
+          <textarea id="f_enquiry" placeholder="Describe your project, current situation, and what you are looking for…">We are looking to set up a new Lube Oil Blending Plant with a capacity of 25 MT/Day in Maharashtra, India. We need complete turnkey solutions including engineering, equipment supply, and commissioning support. Please share a detailed quotation at the earliest.</textarea>
+        </div>
+        <div class="form-group">
+          <label>Budget Range <span class="opt">(Optional)</span></label>
+          <select id="f_budget">
+            <option value="">Select Budget</option>
+            <option value="Below ₹50 Lakh">Below ₹50 Lakh / $60K</option>
+            <option value="₹50L–₹2 Cr">₹50L–₹2 Cr / $60K–240K</option>
+            <option value="₹2–₹10 Cr" selected>₹2–₹10 Cr / $240K–1.2M</option>
+            <option value="₹10 Cr+">₹10 Cr+ / $1.2M+</option>
+            <option value="To be discussed">To be discussed</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>How did you hear about us? <span class="opt">(Optional)</span></label>
+          <select id="f_source">
+            <option value="">Select Source</option>
+            <option value="Google Search" selected>Google Search</option>
+            <option value="LinkedIn">LinkedIn</option>
+            <option value="YouTube">YouTube</option>
+            <option value="Referral">Referral / Word of Mouth</option>
+            <option value="Exhibition / Trade Show">Exhibition / Trade Show</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+        <div class="form-group full">
+          <label>Additional Notes <span class="opt">(Optional)</span></label>
+          <textarea id="f_notes" placeholder="Any additional details, specific requirements, or questions…" style="min-height:80px;"></textarea>
+        </div>
+      </div>
+      <div class="btn-row">
+        <div style="display:flex;gap:10px;flex-wrap:wrap;">
+          <button class="btn btn-secondary" onclick="prevStep(4)">
+            <svg viewBox="0 0 24 24"><path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z"/></svg>
+            Back
+          </button>
+          <button class="btn btn-reset" onclick="resetForm()">
+            <svg viewBox="0 0 24 24"><path d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6a6 6 0 01-6 6 6 6 0 01-6-6H4a8 8 0 008 8 8 8 0 008-8c0-4.42-3.58-8-8-8z"/></svg>
+            Reset
+          </button>
+        </div>
+        <button class="btn btn-primary" onclick="submitForm()">
+          Submit Enquiry
+          <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- SUCCESS PANEL -->
+    <div class="success-panel" id="successPanel">
+      <div class="success-icon">
+        <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>
+      </div>
+      <h2>Enquiry Submitted! 🎉</h2>
+      <p>Thank you for reaching out to Frigmaires Engineers. Download your filled form as a PDF and share it directly on WhatsApp.</p>
+      <div class="action-buttons">
+        <button class="btn btn-pdf" onclick="downloadPDF()">
+          <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
+          Download PDF
+        </button>
+        <button class="btn btn-wa" onclick="shareWhatsApp()">
+          <svg viewBox="0 0 24 24"><path d="M17.47 14.38c-.3-.15-1.76-.87-2.03-.97s-.47-.15-.67.15-.77.97-.94 1.17-.35.22-.64.07a8.1 8.1 0 01-2.39-1.47 8.98 8.98 0 01-1.65-2.06c-.17-.3 0-.46.13-.6s.3-.35.44-.52.2-.3.3-.5.05-.37-.02-.52-.67-1.6-.91-2.19c-.24-.58-.49-.5-.67-.51h-.57c-.2 0-.52.07-.8.37S6 7.87 6 9.07c0 1.2.87 2.37 1 2.54s1.72 2.63 4.17 3.68a14.1 14.1 0 001.39.52c.58.18 1.11.16 1.53.1.47-.07 1.44-.59 1.64-1.16.2-.57.2-1.06.14-1.16-.06-.1-.25-.16-.54-.3zM12.05 2a10 10 0 00-8.49 15.25L2 22l4.87-1.54A10 10 0 1012.05 2z"/></svg>
+          Send on WhatsApp
+        </button>
+        <button class="btn btn-secondary" onclick="resetForm()">
+          <svg viewBox="0 0 24 24"><path d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6a6 6 0 01-6 6 6 6 0 01-6-6H4a8 8 0 008 8 8 8 0 008-8c0-4.42-3.58-8-8-8z"/></svg>
+          New Enquiry
+        </button>
+      </div>
+    </div>
+
+  </div><!-- end card -->
+</div><!-- end container -->
+
+<!-- FOOTER -->
+<div class="footer-strip">
+  <p>© 2024 <a href="https://frigmaires.com" target="_blank">Frigmaires Engineers</a> — All Rights Reserved &nbsp;|&nbsp;
+     Office: Lower Parel, Mumbai 400013, India &nbsp;|&nbsp;
+     <a href="tel:+919820435157">+91 9820435157</a> &nbsp;|&nbsp;
+     <a href="mailto:info@frigmaires.com">info@frigmaires.com</a>
+  </p>
+</div>
+
+<script>
+/* ── STEP LOGIC ── */
+let currentStep = 1;
+const totalSteps = 4;
+
+function showStep(n) {
+  for (let i = 1; i <= totalSteps; i++) {
+    document.getElementById('page' + i).classList.remove('active');
+    const sc = document.getElementById('sc' + i);
+    const sl = document.getElementById('sl' + i);
+    sc.className = 'step-circle';
+    sl.className = 'step-label';
+    if (i < n)  { sc.classList.add('done'); sl.classList.add('done'); sc.innerHTML = '✓'; }
+    if (i === n){ sc.classList.add('active'); sl.classList.add('active'); sc.innerHTML = i; }
+    if (i > n)  { sc.innerHTML = i; }
+  }
+  document.getElementById('page' + n).classList.add('active');
+  currentStep = n;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function nextStep(from) {
+  if (!validateStep(from)) return;
+  if (from < totalSteps) showStep(from + 1);
+}
+function prevStep(from) { if (from > 1) showStep(from - 1); }
+
+/* ── VALIDATION ── */
+function validateStep(step) {
+  const required = {
+    1: ['f_name','f_email','f_phone','f_country'],
+    2: ['f_biztype'],
+    3: ['f_product'],
+    4: ['f_enquiry']
+  };
+  let ok = true;
+  for (const id of (required[step] || [])) {
+    const el = document.getElementById(id);
+    if (!el || !el.value.trim()) {
+      el && (el.style.borderColor = '#e74c3c');
+      el && el.addEventListener('input', () => el.style.borderColor = '', { once: true });
+      ok = false;
+    }
+  }
+  if (!ok) alert('Please fill in all required fields (marked with *).');
+  return ok;
+}
+
+/* ── SUBMIT ── */
+function submitForm() {
+  if (!validateStep(4)) return;
+  for (let i = 1; i <= totalSteps; i++) {
+    document.getElementById('page' + i).classList.remove('active');
+    const sc = document.getElementById('sc' + i);
+    const sl = document.getElementById('sl' + i);
+    sc.className = 'step-circle done';
+    sl.className = 'step-label done';
+    sc.innerHTML = '✓';
+  }
+  document.getElementById('successPanel').style.display = 'block';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+/* ── RESET ── */
+function resetForm() {
+  if (!confirm('Reset the entire form? All entered data will be cleared.')) return;
+  ['f_name','f_email','f_phone','f_city','f_company','f_website','f_capacity','f_enquiry','f_notes'].forEach(id => {
+    const el = document.getElementById(id); if(el) el.value = '';
+  });
+  ['f_country','f_biztype','f_turnover','f_product','f_timeline','f_budget','f_source'].forEach(id => {
+    const el = document.getElementById(id); if(el) el.value = '';
+  });
+  document.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
+  document.getElementById('successPanel').style.display = 'none';
+  showStep(1);
+}
+
+/* ── GATHER DATA ── */
+function getFormData() {
+  const services = [];
+  document.querySelectorAll('#page3 .checkbox-item input[type="checkbox"]').forEach((cb, i) => {
+    if (cb.checked) services.push(cb.parentElement.querySelector('span').textContent);
+  });
+  return {
+    name:     document.getElementById('f_name').value || '—',
+    email:    document.getElementById('f_email').value || '—',
+    phone:    document.getElementById('f_phone').value || '—',
+    country:  document.getElementById('f_country').value || '—',
+    city:     document.getElementById('f_city').value || '—',
+    company:  document.getElementById('f_company').value || '—',
+    website:  document.getElementById('f_website').value || '—',
+    biztype:  document.getElementById('f_biztype').value || '—',
+    turnover: document.getElementById('f_turnover').value || '—',
+    product:  document.getElementById('f_product').value || '—',
+    capacity: document.getElementById('f_capacity').value || '—',
+    timeline: document.getElementById('f_timeline').value || '—',
+    services: services.join(', ') || '—',
+    enquiry:  document.getElementById('f_enquiry').value || '—',
+    budget:   document.getElementById('f_budget').value || '—',
+    source:   document.getElementById('f_source').value || '—',
+    notes:    document.getElementById('f_notes').value || '—',
+    date:     new Date().toLocaleDateString('en-IN', { day:'2-digit', month:'long', year:'numeric' })
+  };
+}
+
+/* ── PDF ── */
+function downloadPDF() {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+  const d = getFormData();
+
+  const NAVY = [11, 31, 58]; const ORANGE = [232, 100, 30]; const GRAY = [107, 122, 153];
+  const LT = [245, 247, 250]; const WHITE = [255, 255, 255]; const DARK = [26, 42, 64];
+
+  let y = 0;
+
+  /* Header band */
+  doc.setFillColor(...NAVY);
+  doc.rect(0, 0, 210, 36, 'F');
+  doc.setFillColor(...ORANGE);
+  doc.rect(0, 33, 210, 3, 'F');
+
+  doc.setTextColor(...WHITE);
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(20);
+  doc.text('FRIGMAIRES ENGINEERS', 14, 14);
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(9);
+  doc.setTextColor(168, 188, 212);
+  doc.text('Plant & Technology for Lubricants, Grease, Construction Chemicals & Coatings', 14, 21);
+  doc.text('www.frigmaires.com  |  info@frigmaires.com  |  +91 7977 088546', 14, 27);
+  doc.setTextColor(...ORANGE);
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(10);
+  doc.text('ENQUIRY FORM', 160, 14);
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(8);
+  doc.setTextColor(168, 188, 212);
+  doc.text('Date: ' + d.date, 160, 20);
+
+  y = 44;
+
+  function section(title) {
+    doc.setFillColor(...NAVY);
+    doc.roundedRect(12, y, 186, 8, 1.5, 1.5, 'F');
+    doc.setTextColor(...WHITE);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(9);
+    doc.text(title.toUpperCase(), 17, y + 5.5);
+    y += 12;
+  }
+
+  function row(label, value, full) {
+    doc.setFillColor(...LT);
+    doc.roundedRect(12, y, full ? 186 : 90, 7.5, 1, 1, 'F');
+    doc.setTextColor(...GRAY);
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(7.5);
+    doc.text(label, 16, y + 5);
+    doc.setTextColor(...DARK);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(8);
+    const w = full ? 170 : 74;
+    const lines = doc.splitTextToSize(value, w);
+    doc.text(lines[0], 16 + (full ? 50 : 38), y + 5);
+    if (!full) {
+      doc.setFillColor(...LT);
+      doc.roundedRect(108, y, 90, 7.5, 1, 1, 'F');
+    }
+    y += 9;
+  }
+
+  function rowPair(l1, v1, l2, v2) {
+    doc.setFillColor(...LT);
+    doc.roundedRect(12, y, 90, 7.5, 1, 1, 'F');
+    doc.setFillColor(...LT);
+    doc.roundedRect(108, y, 90, 7.5, 1, 1, 'F');
+    doc.setTextColor(...GRAY); doc.setFont('helvetica','normal'); doc.setFontSize(7.5);
+    doc.text(l1, 16, y+5); doc.text(l2, 112, y+5);
+    doc.setTextColor(...DARK); doc.setFont('helvetica','bold'); doc.setFontSize(8);
+    doc.text(v1 || '—', 44, y+5); doc.text(v2 || '—', 140, y+5);
+    y += 9;
+  }
+
+  function textarea(label, value) {
+    const lines = doc.splitTextToSize(value, 170);
+    const h = Math.max(12, lines.length * 5 + 8);
+    doc.setFillColor(...LT);
+    doc.roundedRect(12, y, 186, h, 1, 1, 'F');
+    doc.setTextColor(...GRAY); doc.setFont('helvetica','normal'); doc.setFontSize(7.5);
+    doc.text(label, 16, y+5.5);
+    doc.setTextColor(...DARK); doc.setFont('helvetica','normal'); doc.setFontSize(8);
+    doc.text(lines, 16, y+11);
+    y += h + 3;
+  }
+
+  /* Sections */
+  section('01  Personal Information');
+  rowPair('Full Name', d.name, 'Email', d.email);
+  rowPair('Phone', d.phone, 'Country', d.country);
+  row('City / State', d.city, true);
+  y += 4;
+
+  section('02  Company Details');
+  rowPair('Company Name', d.company, 'Business Type', d.biztype);
+  rowPair('Website', d.website, 'Annual Turnover', d.turnover);
+  y += 4;
+
+  section('03  Product of Interest');
+  rowPair('Product / Plant', d.product, 'Plant Capacity', d.capacity);
+  rowPair('Project Timeline', d.timeline, '', '');
+  row('Services Required', d.services, true);
+  y += 4;
+
+  section('04  Enquiry Details');
+  textarea('Project Description / Enquiry', d.enquiry);
+  rowPair('Budget Range', d.budget, 'Source', d.source);
+  if (d.notes && d.notes !== '—') { y += 2; textarea('Additional Notes', d.notes); }
+
+  /* Footer */
+  y = 280;
+  doc.setFillColor(...NAVY);
+  doc.rect(0, y, 210, 17, 'F');
+  doc.setTextColor(168, 188, 212); doc.setFont('helvetica','normal'); doc.setFontSize(7.5);
+  doc.text('Frigmaires Engineers  |  Lower Parel, Mumbai 400013  |  info@frigmaires.com  |  +91 9820435157', 14, y+6);
+  doc.text('This enquiry form was submitted via frigmaires.com', 14, y+11);
+
+  doc.save('Frigmaires_Enquiry_' + d.name.replace(/\s+/g,'_') + '.pdf');
+}
+
+/* ── WHATSAPP ── */
+function shareWhatsApp() {
+  const d = getFormData();
+  const msg = `*Frigmaires Engineers — New Enquiry*\n\n` +
+    `👤 *Name:* ${d.name}\n📧 *Email:* ${d.email}\n📞 *Phone:* ${d.phone}\n🌍 *Country:* ${d.country}\n` +
+    `🏢 *Company:* ${d.company} (${d.biztype})\n` +
+    `🏭 *Product:* ${d.product}\n📦 *Capacity:* ${d.capacity}\n⏰ *Timeline:* ${d.timeline}\n` +
+    `💬 *Enquiry:* ${d.enquiry.substring(0,200)}${d.enquiry.length > 200 ? '…' : ''}\n\n` +
+    `_Please find attached the detailed PDF enquiry form._\n\n` +
+    `🌐 www.frigmaires.com`;
+  const url = 'https://wa.me/+917977088546?text=' + encodeURIComponent(msg);
+  window.open(url, '_blank');
+}
+</script>
+</body>
+</html>
